@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="cohereHttpRequestConfig" doc:name="HTTP Request configuration" doc:id="46582ce5-8274-4ef2-93cf-54490660673e" basePath="/v1">
+		<http:request-connection protocol="HTTPS" host="api.cohere.ai" port="443" />
+	</http:request-config>
+	<sub-flow name="loadWikipediaTrainingData" doc:id="263e86a6-51de-4b81-9a6c-522209530e6c" >
+		<ee:transform doc:name="Transform Message" doc:id="7a9317cd-e6c0-4055-951f-c1560412acf1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var rawTrainingData = readUrl("classpath://wikipedia-train.csv", "text/plain")
+var escapedTrainingData = rawTrainingData replace /""/ with '\"'
+var kaggleWikipediaTrain = read(escapedTrainingData, "application/csv")
+---
+kaggleTrain]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<flow name="cohereFlow" doc:id="c3e90344-0fd7-4959-9168-e49458ee8b6c" >
+		<scheduler doc:name="Scheduler" doc:id="e247e62b-c916-497c-9835-fc39d411747e" >
+			<scheduling-strategy >
+				<fixed-frequency timeUnit="HOURS"/>
+			</scheduling-strategy>
+		</scheduler>
+				<logger level="INFO" doc:name="INFO" doc:id="a17e7b73-dbfb-4ed4-b97f-822a825153ce" message="starting" category="ai.cohere"/>
+		<ee:transform doc:name="inputs" doc:id="4837ccf5-c904-4a11-a17a-0b8f04d7ea15" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	inputs: ["carrots, peas, and potatoes"],
+	model: p("api.cohere.model")
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="classify" doc:id="ee2715b2-235a-48b4-8fa7-8c5895c4ef9b" config-ref="cohereHttpRequestConfig" path="/classify" responseTimeout="120000">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ p("api.cohere.key")
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="INFO" doc:id="7abbdc9d-5dd3-44af-a405-4690ee1f7a29" message="#[payload]" category="ai.cohere"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="false" doc:name="On Error Propagate" doc:id="2b76abfc-3bd1-49a4-87e1-26ed92531793" >
+				<logger level="ERROR" doc:name="ERROR" doc:id="6b16e153-c254-4cff-88d7-3979a0f1fd67" message="#[error.errorMessage.payload]" category="ai.cohere"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

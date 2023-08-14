@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="ibmWatsonNluRequestConfig" doc:name="HTTP Request configuration" doc:id="6a385d87-920e-4a8d-96f4-6411b979dd62" basePath="/instances/153abc92-b790-4248-b50a-0c81b82c75d1" >
+		<http:request-connection protocol="HTTPS" host="api.us-south.natural-language-understanding.watson.cloud.ibm.com" />
+	</http:request-config>
+</mule>

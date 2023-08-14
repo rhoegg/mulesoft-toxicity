@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="awsComprehendHttpRequestConfig" doc:name="HTTP Request configuration" doc:id="37806a8e-ceea-4b8d-9eaa-59e949739798" >
+		<http:request-connection host="comprehend.us-east-2.amazonaws.com" protocol="HTTPS"/>
+	</http:request-config>
+	<flow name="awscomprehendFlow" doc:id="69d1e70e-abc4-4a9a-ad25-9d69fe14fe93" >
+		<ee:transform doc:name="input" doc:id="1fda864e-1abe-4dc9-8238-22c11782ddc5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Text: "Cry some more you stupid fool",
+	EndpointArn: p("api.aws.arn")
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[%dw 2.0&#10;import generateSecureAWSHeaders from dw::com::ambassadorpatryk::aws::Auth&#10;output application/json&#10;---&#10;generateSecureAWSHeaders(&#10;	'POST',&#10;	'us-east-2',&#10;	'comprehend',&#10;	'ClassifyDocument',&#10;	'/',&#10;	'',&#10;	payload,&#10;	p(&quot;aws.api.accessKey&quot;),&#10;	p(&quot;aws.api.secret&quot;)&#10;)]" doc:name="awsHeaders" doc:id="19d25d2e-cb8e-49ca-8c99-ee9a52b9387d" variableName="awsheaders"/>
+		<http:request method="POST" doc:name="ClassifyDocument" doc:id="07b97bfe-3bd8-4552-a7fe-7ac361fccdd5" config-ref="awsComprehendHttpRequestConfig" path="/ClassifyDocument">
+			<http:headers ><![CDATA[#[vars.awsheaders]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="INFO" doc:id="deef2a2f-1d7a-4065-8d57-f4ab91c810dc" message="#[payload]" category="ai.aws"/>
+	</flow>
+</mule>

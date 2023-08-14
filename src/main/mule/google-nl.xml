@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="googleapisHttpRequestConfig" doc:name="HTTP Request configuration" doc:id="de671125-7844-4d14-b19c-002e9c8f29e0" >
+		<http:request-connection protocol="HTTPS" host="www.googleapis.com" port="443" />
+	</http:request-config>
+	<http:request-config name="googleLanguageHttpRequestConfig" doc:name="HTTP Request configuration" doc:id="cbab9ab4-0110-4fc6-ba8a-ee31ca6adb8d" basePath="/v1" >
+		<http:request-connection protocol="HTTPS" host="language.googleapis.com" port="443" />
+	</http:request-config>
+	<flow name="authGoogleWithServiceAccount" doc:id="d5c61cdd-b864-4a82-bb4e-fd67532ed51b" >
+		<ee:transform doc:name="jwt-bearer token request" doc:id="3787816d-b4a6-4d07-86d3-85ed9b030a31">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+import JWT from jwt::RSA
+output application/x-www-form-urlencoded
+
+fun toUnixTime(timestamp) = timestamp as Number {units: "seconds"}
+
+var serviceAccountKey = readUrl("classpath://" ++ p("api.google.serviceAccount"), "application/json")
+
+var scopes = [
+	"https://www.googleapis.com/auth/cloud-language",
+	"https://www.googleapis.com/auth/cloud-platform"
+]
+
+var jwtHeader = {
+	typ: "JWT",
+	alg: "RS256",
+	kid: serviceAccountKey.private_key_id
+}
+
+var jwtPayload = {
+	iss: serviceAccountKey.client_email,
+	sub: serviceAccountKey.client_email,
+	aud: "https://www.googleapis.com/oauth2/v4/token",
+	scope: scopes joinBy " ",
+	iat: toUnixTime(now()),
+	exp: toUnixTime(now() + |PT1H|)
+}
+---
+{
+	grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+	assertion: JWT(jwtHeader, jwtPayload, serviceAccountKey.private_key, 'Sha256withRSA')
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="POST /oauth2/v4/token" doc:id="ba697efe-e3b1-453c-a71d-f20dcec78ecd" config-ref="googleapisHttpRequestConfig" path="/oauth2/v4/token" />
+	</flow>
+	<flow name="moderateGoogle" doc:id="4cd84bb6-35d9-471f-a397-1277818dd677" >
+		<flow-ref doc:name="authGoogleWithServiceAccount" doc:id="d13bca6e-dbb9-4ad0-980d-9cdd7cd355f9" name="authGoogleWithServiceAccount" target="token" targetValue="#[payload.access_token]"/>
+		<ee:transform doc:name="document" doc:id="6ab4b844-f1fe-4691-bdca-c398f00a9866" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+document: {
+	"type": "PLAIN_TEXT",
+	language: "en",
+	content: "every one of you should try playing a game of bridge"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="documents.moderateText" doc:id="7b0db3fc-d884-48ee-8965-1742b6399131" config-ref="googleLanguageHttpRequestConfig" path="documents:moderateText">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ vars.token
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="INFO" doc:id="ca0798b6-28df-4ddb-9ceb-d42ea4555c61" message="#[payload]" category="moderation.google"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cc82a665-42e8-45f3-88dd-454056fcda6d" >
+				<logger level="ERROR" doc:name="ERROR" doc:id="686c720e-a5bb-4ccf-b04f-d6ea5602788b" message="#[error.errorMessage.payload]"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
