@@ -5,7 +5,7 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="1a4f6e4b-22a8-47c4-bca4-a2f10a79f214" basePath="/v1" >
+	<http:request-config name="openAiHttpRequestConfig" doc:name="HTTP Request configuration" doc:id="1a4f6e4b-22a8-47c4-bca4-a2f10a79f214" basePath="/v1" >
 		<http:request-connection protocol="HTTPS" host="api.openai.com" port="443" />
 	</http:request-config>
 	<flow name="openaiFlow" doc:id="5a749e31-64bd-40ce-80d0-fd161e9ea1d3" >
@@ -15,11 +15,12 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 output application/json
 ---
 {
-	"input": "There's no way I'd spend that much money on a car"
+	"input": payload.comment
+	//"There's no way I'd spend that much money on a car"
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<http:request method="POST" doc:name="POST /moderations" doc:id="00ba2992-f385-4bb2-b38d-1b621c407371" config-ref="HTTP_Request_configuration" path="/moderations">
+		<http:request method="POST" doc:name="POST /moderations" doc:id="00ba2992-f385-4bb2-b38d-1b621c407371" config-ref="openAiHttpRequestConfig" path="/moderations">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {

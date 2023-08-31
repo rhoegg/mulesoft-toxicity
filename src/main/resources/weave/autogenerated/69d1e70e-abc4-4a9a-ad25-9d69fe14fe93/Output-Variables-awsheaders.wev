@@ -1,0 +1,10 @@
+%dw 2.0
+
+type auto_69d1e70e_abc4_4a9a_ad25_9d69fe14fe93_Output_Variables_awsheaders = {|
+  Authorization: String, 
+  "x-amz-date": String {"format": "yyyyMMdd'T'HHmmss'Z'"}, 
+  "x-amz-target": String, 
+  host: String, 
+  "content-type": String
+|}
+

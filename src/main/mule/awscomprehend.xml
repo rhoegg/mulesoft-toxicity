@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+ 
 <mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -10,20 +10,36 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	</http:request-config>
 	<flow name="awscomprehendFlow" doc:id="69d1e70e-abc4-4a9a-ad25-9d69fe14fe93" >
 		<ee:transform doc:name="input" doc:id="1fda864e-1abe-4dc9-8238-22c11782ddc5" >
-			<ee:message >
+			<ee:message>
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	Text: "Cry some more you stupid fool",
+	Text: payload.comment,
+	//"Cry some more you stupid fool",
 	EndpointArn: p("api.aws.arn")
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<set-variable value="#[%dw 2.0&#10;import generateSecureAWSHeaders from dw::com::ambassadorpatryk::aws::Auth&#10;output application/json&#10;---&#10;generateSecureAWSHeaders(&#10;	'POST',&#10;	'us-east-2',&#10;	'comprehend',&#10;	'ClassifyDocument',&#10;	'/',&#10;	'',&#10;	payload,&#10;	p(&quot;aws.api.accessKey&quot;),&#10;	p(&quot;aws.api.secret&quot;)&#10;)]" doc:name="awsHeaders" doc:id="19d25d2e-cb8e-49ca-8c99-ee9a52b9387d" variableName="awsheaders"/>
-		<http:request method="POST" doc:name="ClassifyDocument" doc:id="07b97bfe-3bd8-4552-a7fe-7ac361fccdd5" config-ref="awsComprehendHttpRequestConfig" path="/ClassifyDocument">
+		<set-variable value="#[%dw 2.0&#10;import generateSecureAWSHeaders from dw::com::ambassadorpatryk::aws::Auth&#10;output application/json&#10;---&#10;generateSecureAWSHeaders(&#10;	'POST',&#10;	'us-east-2',&#10;	'comprehend',&#10;	'Comprehend_20171127.ClassifyDocument',&#10;	'/',&#10;	'',&#10;	payload,&#10;	p(&quot;api.aws.accessKey&quot;),&#10;	p(&quot;api.aws.secret&quot;)&#10;)]" doc:name="awsHeaders" doc:id="19d25d2e-cb8e-49ca-8c99-ee9a52b9387d" variableName="awsheaders"/>
+		<http:request method="POST" doc:name="ClassifyDocument" doc:id="07b97bfe-3bd8-4552-a7fe-7ac361fccdd5" config-ref="awsComprehendHttpRequestConfig" path="/">
 			<http:headers ><![CDATA[#[vars.awsheaders]]]></http:headers>
 		</http:request>
 		<logger level="INFO" doc:name="INFO" doc:id="deef2a2f-1d7a-4065-8d57-f4ab91c810dc" message="#[payload]" category="ai.aws"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e21d8c4b-d2ea-4512-818a-8c8498491737" >
+				<logger level="ERROR" doc:name="ERROR" doc:id="1740bf6e-9fd3-4d6a-83f2-e2f667567bc4" message="#[error.errorMessage.payload]" category="ai.aws" />
+				<ee:transform doc:name="error payload" doc:id="c8da24d8-439b-4d7c-9f83-4925bfb6c7a4" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: error.errorMessage.payload
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
 	</flow>
 </mule>

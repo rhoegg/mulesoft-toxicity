@@ -20,7 +20,7 @@ output application/x-www-form-urlencoded
 
 fun toUnixTime(timestamp) = timestamp as Number {units: "seconds"}
 
-var serviceAccountKey = readUrl("classpath://" ++ p("api.google.serviceAccount"), "application/json")
+var serviceAccountKey = readUrl("classpath://" ++ p("api.googlenl.serviceAccount"), "application/json")
 
 var scopes = [
 	"https://www.googleapis.com/auth/cloud-language",
@@ -60,7 +60,8 @@ output application/json
 document: {
 	"type": "PLAIN_TEXT",
 	language: "en",
-	content: "every one of you should try playing a game of bridge"
+	content: payload.comment
+	//"every one of you should try playing a game of bridge"
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>

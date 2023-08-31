@@ -22,11 +22,6 @@ kaggleTrain]]></ee:set-payload>
 		</ee:transform>
 	</sub-flow>
 	<flow name="cohereFlow" doc:id="c3e90344-0fd7-4959-9168-e49458ee8b6c" >
-		<scheduler doc:name="Scheduler" doc:id="e247e62b-c916-497c-9835-fc39d411747e" >
-			<scheduling-strategy >
-				<fixed-frequency timeUnit="HOURS"/>
-			</scheduling-strategy>
-		</scheduler>
 				<logger level="INFO" doc:name="INFO" doc:id="a17e7b73-dbfb-4ed4-b97f-822a825153ce" message="starting" category="ai.cohere"/>
 		<ee:transform doc:name="inputs" doc:id="4837ccf5-c904-4a11-a17a-0b8f04d7ea15" >
 			<ee:message >
@@ -34,7 +29,7 @@ kaggleTrain]]></ee:set-payload>
 output application/json
 ---
 {
-	inputs: ["carrots, peas, and potatoes"],
+	inputs: [payload.comment], // supports bulk
 	model: p("api.cohere.model")
 }]]></ee:set-payload>
 			</ee:message>

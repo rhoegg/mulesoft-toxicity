@@ -1,0 +1,7 @@
+%dw 2.0
+
+type auto_5a749e31_64bd_40ce_80d0_fd161e9ea1d3_Input_Payload = {
+  comment: String, 
+  _?: Any
+}
+

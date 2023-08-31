@@ -1,10 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<http:request-config name="ibmWatsonNluRequestConfig" doc:name="HTTP Request configuration" doc:id="6a385d87-920e-4a8d-96f4-6411b979dd62" basePath="/instances/153abc92-b790-4248-b50a-0c81b82c75d1" >
-		<http:request-connection protocol="HTTPS" host="api.us-south.natural-language-understanding.watson.cloud.ibm.com" />
+		<http:request-connection protocol="HTTPS" host="api.us-south.natural-language-understanding.watson.cloud.ibm.com" >
+			<http:authentication >
+				<http:basic-authentication username="apikey" password="${api.ibm.key}" />
+			</http:authentication>
+		</http:request-connection>
 	</http:request-config>
+	<flow name="ibm-watson-nluFlow" doc:id="61ba8fb2-edd6-473b-bc3b-cad4dc9e6f6b" >
+		<ee:transform doc:name="Analyze Text request" doc:id="51165a22-3707-4825-afd6-e1102aa325d4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	text: payload.comment,
+	//"This class is the worst, let's set Mr. Hoegg on fire",
+	features: {
+		classifications: {
+			model: p("api.ibm.modelId")
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="analyze" doc:id="a30fc317-503b-4179-9b2b-ba9a3f61fb61" config-ref="ibmWatsonNluRequestConfig" path="/v1/analyze?version=2022-04-07">
+		</http:request>
+		<logger level="INFO" doc:name="INFO" doc:id="071d4091-04f8-41b9-bb78-1670bf71a82e" message="#[payload]" category="ai.ibm"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="false" doc:name="On Error Propagate" doc:id="474b7e01-d035-452b-a789-6f9a18cf7bc5" >
+				<logger level="ERROR" doc:name="ERROR" doc:id="84c9bfed-469a-41c5-8937-941b1e503274" message="#[error.errorMessage.payload]" category="ai.ibm"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
 </mule>
