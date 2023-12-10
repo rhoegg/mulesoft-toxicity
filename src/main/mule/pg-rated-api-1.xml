@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:azure-cosmos-db-connector-mule-4="http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
-http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4 http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4/current/mule-azure-cosmos-db-connector-mule-4.xsd">
-    <apikit:config name="pg-rated-api-config" api="resource::789e5399-d140-406c-85d3-79d63c41f55b:pg-rated-api:1.0.0:raml:zip:pg-rated-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <flow name="pg-rated-api-main">
-        <http:listener path="/api/*" doc:name="/api/*" config-ref="HTTP_Listener_config">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="pg-rated-api-1-config" api="resource::2c5ae331-f1ac-47db-9b98-fcc3872caac4:pg-rated-api-1:1.0.0:raml:zip:pg-rated-api-1.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="pg-rated-api-1-main">
+        <http:listener path="/api/*" config-ref="HTTP_Listener_config">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
@@ -12,7 +11,7 @@ http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4 http://www.
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="pg-rated-api-config" />
+        <apikit:router config-ref="pg-rated-api-1-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform doc:name="Transform Message">
@@ -94,8 +93,8 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="pg-rated-api-console">
-        <http:listener path="/console/*" doc:name="/console/*" config-ref="HTTP_Listener_config">
+    <flow name="pg-rated-api-1-console">
+        <http:listener path="/console/*" config-ref="HTTP_Listener_config">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
@@ -104,7 +103,7 @@ output application/json
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:console config-ref="pg-rated-api-config" />
+        <apikit:console config-ref="pg-rated-api-1-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:NOT_FOUND">
                 <ee:transform doc:name="Transform Message">
@@ -121,31 +120,31 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="post:\comments:application\json:pg-rated-api-config">
-		<set-variable value="#[payload.comment]" doc:name="comment" doc:id="d22d91f0-5b81-4ac3-a448-d950966236a8" variableName="comment"/>
-		<scatter-gather doc:name="Scatter-Gather" doc:id="1d26c667-b27d-4999-a22f-9b340074649c" >
+    <flow name="post:\comments:application\json:pg-rated-api-1-config">
+		<set-variable value="#[payload.comment]" doc:name="comment" doc:id="b91084a6-7100-4800-97a4-ba1cafa12fcc" variableName="comment"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="03e3e384-0b2a-4245-84b9-c7c5f00ced37" >
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="550cad05-328f-4e89-bd3c-6c0432e2c8a4" />
-				<flow-ref doc:name="IBM Watson NLU" doc:id="1f6d84a3-e314-471c-b019-0c61814730e8" name="ibm-watson-nluFlow"/>
+				<logger level="INFO" doc:name="Logger" doc:id="bb50f835-dab0-4fd8-9168-06f0a14084f5" />
+				<flow-ref doc:name="IBM Watson NLU" doc:id="c465381e-3895-462c-9f5c-e218c184ba84" name="ibm-watson-nluFlow"/>
 			</route>
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="720185ac-04d8-4e3d-8994-1772b75e19e5" />
-				<flow-ref doc:name="OpenAI" doc:id="1bbb42a1-2866-409b-a1ea-69011373f43f" name="openaiFlow"/>
+				<logger level="INFO" doc:name="Logger" doc:id="e446d106-7c9f-4222-9da1-d1e1d0b984a2" />
+				<flow-ref doc:name="OpenAI" doc:id="79a0c6d1-c223-4d9e-b531-6a5416d07ad9" name="openaiFlow"/>
 			</route>
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="d3d7b3d3-50de-488a-a58d-3a98b731631c" />
-				<flow-ref doc:name="Google NL Moderation" doc:id="c14ddbba-5937-4545-82a2-bfd9554344da" name="moderateGoogle"/>
+				<logger level="INFO" doc:name="Logger" doc:id="891fac32-6884-4b13-838d-1aa3d3065c5d" />
+				<flow-ref doc:name="Google NL Moderation" doc:id="6cfc8f46-7c09-4d9f-9626-06f13680af2e" name="moderateGoogle"/>
 			</route>
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="bedc29ec-b4b1-4681-acee-86600ec3883e" />
-				<flow-ref doc:name="Cohere" doc:id="1aed594c-573a-40ae-bbe1-ef099d78adbc" name="cohereFlow"/>
+				<logger level="INFO" doc:name="Logger" doc:id="76ea805a-9099-4d49-989d-ea137c332605" />
+				<flow-ref doc:name="Cohere" doc:id="aa6f0be6-ffe2-47d2-9eb9-9d2f4fbdf99f" name="cohereFlow"/>
 			</route>
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="26a7382f-36de-4f61-ac89-b3819e2383b6" />
-				<flow-ref doc:name="AWS Comprehend" doc:id="779c33f3-4ec0-4961-af48-18f891704d9a" name="awscomprehendFlow"/>
+				<logger level="INFO" doc:name="Logger" doc:id="31ed066c-1ed7-461e-8318-d0c28a449633" />
+				<flow-ref doc:name="AWS Comprehend" doc:id="d1963515-eed6-4a91-8ce8-920bd43aa950" name="awscomprehendFlow"/>
 			</route>
 		</scatter-gather>
-		<ee:transform doc:name="composite result" doc:id="46170b71-729e-4833-a008-87342100260d" >
+		<ee:transform doc:name="composite result" doc:id="fe587048-ac4c-407c-a578-0d223c088222" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -165,8 +164,10 @@ var awsResult = payload[4].payload
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<async doc:name="Async" doc:id="3a0a10e0-45ce-4d9c-a0c4-967ef5992dfd" >
-			<flow-ref doc:name="saveResultsToCosmos" doc:id="ffe44ef7-5469-48ae-824b-6c6328f92626" name="saveResultsToCosmos" />
+		<async doc:name="Async" doc:id="48c89576-de38-4cdd-9614-f70292cf60ac" >
+			<flow-ref doc:name="saveResultsToCosmos" doc:id="8a6bdbe0-4f02-4e96-9af1-51301d17a765" name="saveResultsToCosmos" />
 		</async>
     </flow>
+		
+	
 </mule>
