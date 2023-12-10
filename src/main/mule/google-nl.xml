@@ -73,6 +73,23 @@ document: {
 }]]]></http:headers>
 		</http:request>
 		<logger level="INFO" doc:name="INFO" doc:id="ca0798b6-28df-4ddb-9ceb-d42ea4555c61" message="#[payload]" category="moderation.google"/>
+		<ee:transform doc:name="to CDM" doc:id="1044f403-19db-4f52-9ab3-71a6d84c5118" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import firstWith from dw::core::Arrays
+output application/json
+var toxicCategory = payload.moderationCategories firstWith (category) ->
+	category.name == "Toxic"
+var otherCategories = payload.moderationCategories filter (category) ->
+	(category.name != "Toxic") and (category.confidence > 0.5)
+---
+{
+	toxic: toxicCategory.confidence > 0.5,
+	confidence: toxicCategory.confidence,
+	detail: otherCategories map $.name joinBy ","
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cc82a665-42e8-45f3-88dd-454056fcda6d" >
 				<logger level="ERROR" doc:name="ERROR" doc:id="686c720e-a5bb-4ccf-b04f-d6ea5602788b" message="#[error.errorMessage.payload]"/>

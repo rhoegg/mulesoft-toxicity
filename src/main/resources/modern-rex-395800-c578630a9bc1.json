@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "modern-rex-395800",
+  "private_key_id": "c578630a9bc183565f9086fd902a74d2e77dba96",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCu6ahQhXmu1vgk\nJcEfVhr1RoxcDt+43m+2h3ovr6zpHsBegnjKzs6GGYtQdXq1prtOEJI5c56EgMZY\nGFb8ibRToEkfBGljMEl/cLDLLDncaJSVa5S1azvwE/I0MJ0Fy/xVnzrWTolDnx5X\nJUtg1EIYccqnq8vlo73DYLhY1x+1w9rNCe/jkDS6ATrMn8MkzCrSDiT1CAn5Vz2m\nXnzaH+XRJeKOu4w2tP+WtKyLRrPOElUz2nfc24xuPOVc0xhbTJGg+j/LIh6zYn37\njwAVnl+lSfcnSyy6hqFTGFqIaNdII1MGYyZnGUD4/K1aIonz3U1fa143vyU9ybqQ\n2dKnV7KPAgMBAAECggEAG7xecxeZ7OEWq7i25SQEwKm6s8BXYTEYetOvIDpVtgj+\nd8jC+bnjItLly1DjBUSr79w4gQFgp2Hk0cRY9Xuqi2uKchouJ0suucAiBghRy9hj\niJwXZ9CEynQx6cJfATPQTrgh9Cizox7rXeXtNtdW/G79iSqjTvCbieHflEAskuhO\npGhlj0kQD1ODhyw+3Dt0nVfW3cuZKHSBQfeB10oM2Lbxiz91j7mN3wjJGhBW7x4/\nQeQknMELovEDkYzbyJrTPA+j1VCQADrFXCyVOYpOYmvM3HrFt2GIFJz3/wNBiGAF\nrSjf7hDGSl3bRTzzb2q7FePfXq4K+k3d28MAwdFdUQKBgQDgIRqYv/IsiPbHbUTO\nz5aeSs4R7CqpcXR+faoAeS45auIhgJksXqM1lWaVSwXcrMiILpVat57tEmaP7vt/\nmphyFuicnAju8SxsR1hOGdrcn/axkwAGjqYBHEMjK73UaM+Ff4pMjb8BxKe59N6c\n19zRIIhQ4mj3vaxPBIEbMedMnwKBgQDHyPC/2oAyJma4fqy52StlM3rHs2LHepRS\nzJJZEzbd6DwBJeO383OM9LaWuAqWmCFYxyAHAZVgjgmZzZeMZlTRhbhRP5410+ug\nlhVpxjRlAtUsArQkcGtcbBDLe3It+oFlFz3jk6mEsogwqXV9Udj8GM/lmxCtantg\nzwvd0oLkEQKBgQCG+Ch2GBEUdJ531ft7t1LynAWgkWHXjDUk/zPi+Ra3CQCIQFL9\nfzg1ynRuLzGmhH52U+cpLC6OgWg2ASp+23A2NEl8FhLjIWUpB4XL8pH0DniW0vlO\n+ZRKUuSzR2IXic5+jCGSnEGMJQsEVsvAE9YsMbUlUFL57cTYCNRethyd7QKBgCMd\nZ2thPU0TQNTGtxdHW4BDJx54ojELk4xmFob/gJJKYlmVTkwjxziMPpeJK5tCjAHt\npex1U8sPzBIzd6KezeOxzC7DrswpPm4QUx0vUEA82jkNFJqfA8/P0rfhL7VzJVEe\nX6tjZdVEB/n9nv/y5d+RgOELe0fvwlXGroBDouvxAoGBAIMw24qiiCkFoVONVaTz\nk2hWp7/00lfFYtBSkTg+sHX9M9yDNAVcHsAsubeu+rs0hbgumiBD8NFC6m+H/bZI\nyJ2nR0sfNOvEnPkVuDkFIEGTV8g3fZSITs+j5w1oF1m0Eol3C1oExyP3Htp2TUUB\noagM6Q6oqQ2Vh6M2oID9oenk\n-----END PRIVATE KEY-----\n",
+  "client_email": "anypointcloud-dev@modern-rex-395800.iam.gserviceaccount.com",
+  "client_id": "116405628676658333873",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/anypointcloud-dev%40modern-rex-395800.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

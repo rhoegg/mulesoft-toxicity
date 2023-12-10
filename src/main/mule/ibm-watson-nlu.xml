@@ -32,6 +32,21 @@ output application/json
 		<http:request method="POST" doc:name="analyze" doc:id="a30fc317-503b-4179-9b2b-ba9a3f61fb61" config-ref="ibmWatsonNluRequestConfig" path="/v1/analyze?version=2022-04-07">
 		</http:request>
 		<logger level="INFO" doc:name="INFO" doc:id="071d4091-04f8-41b9-bb78-1670bf71a82e" message="#[payload]" category="ai.ibm"/>
+		<ee:transform doc:name="to CDM" doc:id="bca60896-c424-4bf4-b09c-d5f4a52478df" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import firstWith from dw::core::Arrays
+output application/json
+
+var toxicClassification = payload.classifications firstWith (classification) ->
+	classification.class_name == "Toxic"
+---
+{
+	toxic: toxicClassification.confidence > 0.5,
+	confidence: toxicClassification.confidence
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="false" doc:name="On Error Propagate" doc:id="474b7e01-d035-452b-a789-6f9a18cf7bc5" >
 				<logger level="ERROR" doc:name="ERROR" doc:id="84c9bfed-469a-41c5-8937-941b1e503274" message="#[error.errorMessage.payload]" category="ai.ibm"/>

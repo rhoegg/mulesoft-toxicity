@@ -28,5 +28,24 @@ output application/json
 }]]]></http:headers>
 		</http:request>
 		<logger level="INFO" doc:name="INFO" doc:id="428d6a22-db15-4f1e-a755-402d09bc7769" message="#[payload]" category="ai.openai"/>
+		<ee:transform doc:name="to CDM" doc:id="59f49598-5a65-49e0-8f95-3a569377625b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var worstCategory = (
+		payload.results[0].category_scores 
+			pluck (score, category) -> {
+				score: score,
+				category: category
+			}
+	) maxBy $.score
+---
+{
+	toxic: payload.results[0].flagged,
+	confidence: worstCategory.score,
+	detail: worstCategory.category
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 </mule>

@@ -16,7 +16,6 @@ output application/json
 ---
 {
 	Text: payload.comment,
-	//"Cry some more you stupid fool",
 	EndpointArn: p("api.aws.arn")
 }]]></ee:set-payload>
 			</ee:message>
@@ -26,6 +25,22 @@ output application/json
 			<http:headers ><![CDATA[#[vars.awsheaders]]]></http:headers>
 		</http:request>
 		<logger level="INFO" doc:name="INFO" doc:id="deef2a2f-1d7a-4065-8d57-f4ab91c810dc" message="#[payload]" category="ai.aws"/>
+		<ee:transform doc:name="to CDM" doc:id="d9c45c17-f662-4a61-96f1-f6f7a2b68d57" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import firstWith from dw::core::Arrays
+output application/json
+
+var decodedPayload = read(payload, "application/json")
+var toxicClass = decodedPayload.Classes firstWith (class) ->
+	class.Name == "Toxic"
+---
+{
+	toxic: toxicClass.Score > 0.5,
+	confidence: toxicClass.Score
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<error-handler >
 			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e21d8c4b-d2ea-4512-818a-8c8498491737" >
 				<logger level="ERROR" doc:name="ERROR" doc:id="1740bf6e-9fd3-4d6a-83f2-e2f667567bc4" message="#[error.errorMessage.payload]" category="ai.aws" />

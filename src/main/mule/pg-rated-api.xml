@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+<mule xmlns:azure-cosmos-db-connector-mule-4="http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4 http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4/current/mule-azure-cosmos-db-connector-mule-4.xsd">
     <apikit:config name="pg-rated-api-config" api="resource::789e5399-d140-406c-85d3-79d63c41f55b:pg-rated-api:1.0.0:raml:zip:pg-rated-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="pg-rated-api-main">
         <http:listener path="/api/*" doc:name="/api/*" config-ref="HTTP_Listener_config">
@@ -143,7 +144,7 @@ output application/json
 				<flow-ref doc:name="AWS Comprehend" doc:id="779c33f3-4ec0-4961-af48-18f891704d9a" name="awscomprehendFlow"/>
 			</route>
 		</scatter-gather>
-		<ee:transform doc:name="Transform Message" doc:id="46170b71-729e-4833-a008-87342100260d" >
+		<ee:transform doc:name="composite result" doc:id="46170b71-729e-4833-a008-87342100260d" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -151,10 +152,8 @@ var ibmResult = payload[0].payload
 var openaiResult = payload[1].payload
 var googleResult = payload[2].payload
 var cohereResult = payload[3].payload
-var awsResult = read(payload[4].payload, "application/json")
+var awsResult = payload[4].payload
 
-fun readJson(responseBody) =
-	read(responseBody, "application/json")
 ---
 {
 	ibm: ibmResult,
@@ -165,5 +164,8 @@ fun readJson(responseBody) =
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<!-- [STUDIO:"Async"]<async doc:name="Async" doc:id="3a0a10e0-45ce-4d9c-a0c4-967ef5992dfd" >
+			<azure-cosmos-db-connector-mule-4:create-document doc:name="Create Document" doc:id="e899b2f7-8d50-4519-829d-f89eb0d03857" />
+		</async> [STUDIO] -->
     </flow>
 </mule>

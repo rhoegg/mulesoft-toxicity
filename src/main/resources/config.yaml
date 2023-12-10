@@ -1,0 +1,16 @@
+api:
+  openai:
+#    key: "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"
+    key: "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" # Shivani
+  cohere:
+    model: "ee47746a-99df-4d67-98e7-6fc2107628eb-ft"
+    key: "CNy1YqQHvRNnPJjgSRrcdgADakogHCMdKg8HwwjF"
+  ibm:
+    modelId: "deee20f4-8ffa-4874-81d8-9e638e2cf4b4" #surge500toxic
+    key: "2gaz-6To6_fnfXRRQe-5tspU8FDwv3y_NSaU-IU23AFK"
+  googlenl:
+    serviceAccount: modern-rex-395800-c578630a9bc1.json
+  aws:
+    arn: arn:aws:comprehend:us-east-2:611644244427:document-classifier-endpoint/worldtournyc-prep
+    accessKey: AKIAY42GWQHFXZJZAJFI
+    secret: "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"
