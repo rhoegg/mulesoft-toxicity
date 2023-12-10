@@ -122,6 +122,7 @@ output application/json
         </error-handler>
     </flow>
     <flow name="post:\comments:application\json:pg-rated-api-config">
+		<set-variable value="#[payload.comment]" doc:name="comment" doc:id="d22d91f0-5b81-4ac3-a448-d950966236a8" variableName="comment"/>
 		<scatter-gather doc:name="Scatter-Gather" doc:id="1d26c667-b27d-4999-a22f-9b340074649c" >
 			<route >
 				<logger level="INFO" doc:name="Logger" doc:id="550cad05-328f-4e89-bd3c-6c0432e2c8a4" />
@@ -164,8 +165,8 @@ var awsResult = payload[4].payload
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<!-- [STUDIO:"Async"]<async doc:name="Async" doc:id="3a0a10e0-45ce-4d9c-a0c4-967ef5992dfd" >
-			<azure-cosmos-db-connector-mule-4:create-document doc:name="Create Document" doc:id="e899b2f7-8d50-4519-829d-f89eb0d03857" />
-		</async> [STUDIO] -->
+		<async doc:name="Async" doc:id="3a0a10e0-45ce-4d9c-a0c4-967ef5992dfd" >
+			<flow-ref doc:name="saveResultsToCosmos" doc:id="ffe44ef7-5469-48ae-824b-6c6328f92626" name="saveResultsToCosmos" />
+		</async>
     </flow>
 </mule>

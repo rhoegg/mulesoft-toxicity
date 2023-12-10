@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_a6b20e2d_faff_47c3_b9cf_a9beadfc8b23_Output_Attributes = {|
+  statusCode: Number, 
+  headers: { _?: String }, 
+  reasonPhrase: String
+|} {"typeAlias": "HttpResponseAttributes",
+"typeId": "com.mulesoft.connector.cosmosdb.api.param.HttpResponseAttributes"}
+

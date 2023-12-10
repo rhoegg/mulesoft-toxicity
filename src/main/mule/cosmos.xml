@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:azure-cosmos-db-connector-mule-4="http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4 http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4/current/mule-azure-cosmos-db-connector-mule-4.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<azure-cosmos-db-connector-mule-4:key-token-config name="Azure_Cosmos_Db_Key_Token_Config" doc:name="Azure Cosmos Db Key Token Config" doc:id="70d8d323-a14b-4294-b9f6-66a5f3ce878f" >
+		<azure-cosmos-db-connector-mule-4:key-token-auth-connection baseUri="${db.cosmos.url}" key="${db.cosmos.key}" version="2018-12-31" />
+	</azure-cosmos-db-connector-mule-4:key-token-config>
+	<flow name="saveResultsToCosmos" doc:id="a6b20e2d-faff-47c3-b9cf-a9beadfc8b23" >
+		<ee:transform doc:name="Transform Message" doc:id="4a738a7d-5e06-4165-b781-d24a77f6a7fb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Id: uuid(),
+	DateTime: now() as String,
+	Comment: vars.comment,
+	AwsToxic: payload.aws.toxic,
+	AwsConfidence: payload.aws.confidence,
+	IbmToxic: payload.ibm.toxic,
+	IbmConfidence: payload.ibm.confidence,
+	CohereToxic: payload.cohere.toxic,
+	CohereConfidence: payload.cohere.confidence,
+	OpenAiToxic: payload.openai.toxic,
+	OpenAiConfidence: payload.openai.confidence,
+	GoogleToxic: payload.google.toxic,
+	GoogleConfidence: payload.google.confidence
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<azure-cosmos-db-connector-mule-4:create-document doc:name="create moderation" doc:id="e899b2f7-8d50-4519-829d-f89eb0d03857" config-ref="Azure_Cosmos_Db_Key_Token_Config" dbIdUriParam="mulesoft-community" collIdUriParam="moderations"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ead0a37a-d9ef-44f9-9cd3-77df83bda471" />
+	</flow>
+</mule>
