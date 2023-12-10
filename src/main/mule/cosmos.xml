@@ -9,13 +9,14 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<azure-cosmos-db-connector-mule-4:key-token-auth-connection baseUri="${db.cosmos.url}" key="${db.cosmos.key}" version="2018-12-31" />
 	</azure-cosmos-db-connector-mule-4:key-token-config>
 	<flow name="saveResultsToCosmos" doc:id="a6b20e2d-faff-47c3-b9cf-a9beadfc8b23" >
-		<ee:transform doc:name="Transform Message" doc:id="4a738a7d-5e06-4165-b781-d24a77f6a7fb" >
+		<set-variable value="#[uuid()]" doc:name="cosmosId" doc:id="80e8a713-5bb7-4e6b-8cfc-2e71aea2b772" variableName="cosmosId"/>
+		<ee:transform doc:name="to Cosmos data model" doc:id="4a738a7d-5e06-4165-b781-d24a77f6a7fb" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	Id: uuid(),
+	id: vars.cosmosId,
 	DateTime: now() as String,
 	Comment: vars.comment,
 	AwsToxic: payload.aws.toxic,
@@ -31,7 +32,12 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<azure-cosmos-db-connector-mule-4:create-document doc:name="create moderation" doc:id="e899b2f7-8d50-4519-829d-f89eb0d03857" config-ref="Azure_Cosmos_Db_Key_Token_Config" dbIdUriParam="mulesoft-community" collIdUriParam="moderations"/>
-		<logger level="INFO" doc:name="Logger" doc:id="ead0a37a-d9ef-44f9-9cd3-77df83bda471" />
+		<azure-cosmos-db-connector-mule-4:create-document doc:name="create moderation" doc:id="e899b2f7-8d50-4519-829d-f89eb0d03857" config-ref="Azure_Cosmos_Db_Key_Token_Config" dbIdUriParam="mulesoftcommunity" collIdUriParam="moderations" xMsDocumentdbPartitionkeyHeader='#[write([payload.id], "application/json")]'/>
+		<logger level="INFO" doc:name="INFO" doc:id="ead0a37a-d9ef-44f9-9cd3-77df83bda471" message="saved item #[vars.cosmosId]" category="cosmos"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5e08e266-39e6-4df7-ae59-c9849eec2604" type="AZURE-COSMOS-DB-CONNECTOR-MULE-4:*">
+				<logger level="INFO" doc:name="ERROR" doc:id="1a4365a5-b967-4d5c-b5ae-6cfb3be75a12" message="#[error.errorMessage.payload]" category="cosmos"/>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 </mule>
