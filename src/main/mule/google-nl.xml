@@ -93,6 +93,16 @@ var otherCategories = payload.moderationCategories filter (category) ->
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cc82a665-42e8-45f3-88dd-454056fcda6d" >
 				<logger level="ERROR" doc:name="ERROR" doc:id="686c720e-a5bb-4ccf-b04f-d6ea5602788b" message="#[error.errorMessage.payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="a1e4c402-6d14-46d8-9777-d0ff0396d6b2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: error.errorMessage.payload
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
 			</on-error-propagate>
 		</error-handler>
 	</flow>

@@ -48,9 +48,19 @@ var toxicClassification = payload.classifications firstWith (classification) ->
 			</ee:message>
 		</ee:transform>
 		<error-handler >
-			<on-error-propagate enableNotifications="true" logException="false" doc:name="On Error Propagate" doc:id="474b7e01-d035-452b-a789-6f9a18cf7bc5" >
-				<logger level="ERROR" doc:name="ERROR" doc:id="84c9bfed-469a-41c5-8937-941b1e503274" message="#[error.errorMessage.payload]" category="ai.ibm"/>
-			</on-error-propagate>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="fe8a3889-2204-4d36-a3ab-3e96ed1d1d0a" >
+				<logger level="ERROR" doc:name="ERROR" doc:id="84c9bfed-469a-41c5-8937-941b1e503274" message="#[error.errorMessage.payload]" category="ai.ibm" />
+				<ee:transform doc:name="Transform Message" doc:id="18454a87-a87d-4ca5-8df6-f5ebd1d4a237">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: error.errorMessage.payload
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
 		</error-handler>
 	</flow>
 </mule>

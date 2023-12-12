@@ -124,23 +124,18 @@ output application/json
 		<set-variable value="#[payload.comment]" doc:name="comment" doc:id="b91084a6-7100-4800-97a4-ba1cafa12fcc" variableName="comment"/>
 		<scatter-gather doc:name="Scatter-Gather" doc:id="03e3e384-0b2a-4245-84b9-c7c5f00ced37" >
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="bb50f835-dab0-4fd8-9168-06f0a14084f5" />
 				<flow-ref doc:name="IBM Watson NLU" doc:id="c465381e-3895-462c-9f5c-e218c184ba84" name="ibm-watson-nluFlow"/>
 			</route>
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="e446d106-7c9f-4222-9da1-d1e1d0b984a2" />
 				<flow-ref doc:name="OpenAI" doc:id="79a0c6d1-c223-4d9e-b531-6a5416d07ad9" name="openaiFlow"/>
 			</route>
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="891fac32-6884-4b13-838d-1aa3d3065c5d" />
 				<flow-ref doc:name="Google NL Moderation" doc:id="6cfc8f46-7c09-4d9f-9626-06f13680af2e" name="moderateGoogle"/>
 			</route>
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="76ea805a-9099-4d49-989d-ea137c332605" />
 				<flow-ref doc:name="Cohere" doc:id="aa6f0be6-ffe2-47d2-9eb9-9d2f4fbdf99f" name="cohereFlow"/>
 			</route>
 			<route >
-				<logger level="INFO" doc:name="Logger" doc:id="31ed066c-1ed7-461e-8318-d0c28a449633" />
 				<flow-ref doc:name="AWS Comprehend" doc:id="d1963515-eed6-4a91-8ce8-920bd43aa950" name="awscomprehendFlow"/>
 			</route>
 		</scatter-gather>
@@ -156,11 +151,11 @@ var awsResult = payload[4].payload
 
 ---
 {
-	ibm: ibmResult,
+	(ibm: ibmResult) if (! ibmResult.error?),
 	openai: openaiResult,
-	google: googleResult,
+	(google: googleResult) if (! googleResult.error?),
 	cohere: cohereResult,
-	aws: awsResult
+	(aws: awsResult) if (! awsResult.error?)
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
