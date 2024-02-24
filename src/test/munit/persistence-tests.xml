@@ -8,5 +8,8 @@
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
 	<munit:config name="persistence-tests.xml" doc:description="This suite will test the cosmos database persistence feature. It should make sure that the data is formatted properly, and should include some error handling."/>
+	<munit:test name="saveResultsToCosmos_shouldGenerateRecordId" doc:id="e2d96581-9526-4d41-83af-82443b3163d8" doc:description="This test should make sure that we generate the record id and it gets saved to the database"/>
+	<munit:test name="saveResultsToCosmos_shouldSaveRecordInJsonFormat" doc:id="5b32a6e9-8288-488e-b580-b3100daf2cbf" doc:description="This test should make sure that all the fields are saved with the proper field name and value from the input, including a timestamp. This implicitly confirms that the proper collection name, database, and credentials are working."/>
+	<munit:test name="givenPersistenceFailure_saveResultsToCosmos_shouldLogUsefulBackendFailureInfo" doc:id="e6b7cae7-84ed-4d83-b115-2ff9eb81bc71" doc:description="This test should log enough information from the Cosmos backend to troubleshoot persistence, but it should not log the user input because it is possibly offensive"/>
 
 </mule>
