@@ -154,7 +154,7 @@ var awsResult = payload[4].payload
 	(ibm: ibmResult) if (! ibmResult.error?),
 	openai: openaiResult,
 	(google: googleResult) if (! googleResult.error?),
-	cohere: cohereResult,
+	(cohere: cohereResult) if (! cohereResult.error?),
 	(aws: awsResult) if (! awsResult.error?)
 }]]></ee:set-payload>
 			</ee:message>

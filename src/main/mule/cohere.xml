@@ -62,9 +62,19 @@ var predictedLabel = labels maxBy (label) ->
 			</ee:message>
 		</ee:transform>
 		<error-handler >
-			<on-error-propagate enableNotifications="true" logException="false" doc:name="On Error Propagate" doc:id="2b76abfc-3bd1-49a4-87e1-26ed92531793" >
-				<logger level="ERROR" doc:name="ERROR" doc:id="6b16e153-c254-4cff-88d7-3979a0f1fd67" message="#[error.errorMessage.payload]" category="ai.cohere"/>
-			</on-error-propagate>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="651a4a6d-532b-4002-98be-557ad1cfbb12" >
+				<logger level="ERROR" doc:name="ERROR" doc:id="6b16e153-c254-4cff-88d7-3979a0f1fd67" message="#[error.errorMessage.payload]" category="ai.cohere" />
+				<ee:transform doc:name="Transform Message" doc:id="61715c50-1860-4a8c-9296-c3d4d31a4679" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: error.errorMessage.payload
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
 		</error-handler>
 	</flow>
 </mule>
