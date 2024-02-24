@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xsi:schemaLocation="
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<munit:config name="persistence-tests.xml" doc:description="This suite will test the cosmos database persistence feature. It should make sure that the data is formatted properly, and should include some error handling."/>
 	<munit:test name="givenGoodInput_saveResultsToCosmos_shouldGenerateRecordId" doc:id="e2d96581-9526-4d41-83af-82443b3163d8" doc:description="This test should make sure that we generate the record id and it gets saved to the database"/>
 	<munit:test name="givenGoodInput_saveResultsToCosmos_shouldSaveRecordInJsonFormat" doc:id="5b32a6e9-8288-488e-b580-b3100daf2cbf" doc:description="This test should make sure that all the fields are saved with the proper field name and value from the input, including a timestamp. This implicitly confirms that the proper collection name, database, and credentials are working."/>
-	<munit:test name="givenPersistenceFailure_saveResultsToCosmos_shouldLogUsefulBackendFailureInfo" doc:id="e6b7cae7-84ed-4d83-b115-2ff9eb81bc71" doc:description="This test should log enough information from the Cosmos backend to troubleshoot persistence, but it should not log the user input because it is possibly offensive"/>
+	<munit:test name="givenPersistenceFailure_saveResultsToCosmos_shouldLogUsefulBackendFailureInfo" doc:id="e6b7cae7-84ed-4d83-b115-2ff9eb81bc71" doc:description="This test should log enough information from the Cosmos backend to troubleshoot persistence, but it should not log the user input because it is possibly offensive">
+		<munit:execution >
+			<logger level="DEBUG" doc:name="required cosmosId not set" doc:id="33b26f9d-91c4-4f2c-8cfd-513b995cb87f" />
+			<ee:transform doc:name="persistence input" doc:id="f21cb198-7076-421e-b79d-ac99c4fd6319">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	openai: {example: "openai-testing", toxic: false, confidence: 98.0},
+	google: {example: "google-testing", toxic: false, confidence: 98.0},
+	cohere: {example: "cohere-testing", toxic: false, confidence: 98.0}
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</munit:execution>
+	</munit:test>
 
 </mule>

@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:azure-cosmos-db-connector-mule-4="http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:azure-cosmos-db-connector-mule-4="http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4 http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4/current/mule-azure-cosmos-db-connector-mule-4.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 	<azure-cosmos-db-connector-mule-4:key-token-config name="Azure_Cosmos_Db_Key_Token_Config" doc:name="Azure Cosmos Db Key Token Config" doc:id="70d8d323-a14b-4294-b9f6-66a5f3ce878f" >
 		<azure-cosmos-db-connector-mule-4:key-token-auth-connection baseUri="${db.cosmos.url}" key="${db.cosmos.key}" version="2018-12-31" />
 	</azure-cosmos-db-connector-mule-4:key-token-config>
 	<flow name="saveResultsToCosmos" doc:id="a6b20e2d-faff-47c3-b9cf-a9beadfc8b23" >
+		<validation:is-not-null doc:name="cosmosId" doc:id="f89faaac-e1ae-48e2-89e2-a30b60c72e79" value="#[vars.cosmosId]">
+			<error-mapping sourceType="VALIDATION:NULL" targetType="TOXICAPP:MISSING_COSMOS_ID" />
+		</validation:is-not-null>
 		<ee:transform doc:name="to Cosmos data model" doc:id="4a738a7d-5e06-4165-b781-d24a77f6a7fb" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0

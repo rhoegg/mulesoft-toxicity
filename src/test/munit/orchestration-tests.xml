@@ -25,9 +25,17 @@ output application/json
 			<flow-ref doc:name="postCommentsFlow" doc:id="8aa7cef9-6fb2-4f98-ab87-be8a34b62fdf" name="post:\comments:application\json:pg-rated-api-1-config"/>
 			<munit-tools:sleep time="750" doc:name="750ms" doc:id="2158b9a5-46b6-40c5-9803-d3cab93c4194" />
 			<set-variable value="#[output application/json --- now()]" doc:name="testTimestamp" doc:id="3cc2874d-1bcb-43a2-be38-2cedc1dd2339" variableName="testTimestamp"/>
-			<azure-cosmos-db-connector-mule-4:get-document doc:name="cosmosId" doc:id="b37b635c-fc74-4831-a338-41ea4e77d7a4" config-ref="Azure_Cosmos_Db_Key_Token_Config" dbIdUriParam="mulesoftcommunity" collIdUriParam="moderations" docIdUriParam="#[vars.cosmosId]" xMsDocumentdbPartitionkeyHeader='#[write([vars.cosmosId], "application/json")]'/>
+			<try doc:name="Try" doc:id="5cb01c5a-bc94-4144-b8da-b12fd6e25e02" >
+				<azure-cosmos-db-connector-mule-4:get-document doc:name="cosmosId" doc:id="b37b635c-fc74-4831-a338-41ea4e77d7a4" config-ref="Azure_Cosmos_Db_Key_Token_Config" dbIdUriParam="mulesoftcommunity" collIdUriParam="moderations" docIdUriParam="#[vars.cosmosId]" xMsDocumentdbPartitionkeyHeader='#[write([vars.cosmosId], "application/json")]' />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="4ecc0f22-9b00-4819-a778-ae105001e787" >
+						<set-payload value="#[error.errorMessage.payload]" doc:name="Set Payload" doc:id="78cd46af-242d-4a90-95cd-1ccd6989f570" />
+					</on-error-continue>
+				</error-handler>
+			</try>
 		</munit:execution>
 		<munit:validation>
+			<munit-tools:assert-that doc:name="retrievedDocument is not null" doc:id="73ae4ba1-478e-4649-816f-a9076e0bf099" message='#["no document found in cosmos DB for generated id ($(vars.cosmosId))"]' expression="#[payload.code]" is='#[MunitTools::not(MunitTools::equalTo("NotFound"))]'/>
 			<munit-tools:assert-that doc:name="record ID is the generated one" doc:id="af0698a6-d75b-43af-a720-d86744757822" expression="#[payload.id]" is="#[MunitTools::equalTo(vars.cosmosId)]"/>
 			<munit-tools:assert-that doc:name="DateTime is recent" doc:id="4849d2eb-fcd7-4791-b15f-8d628e6df18d" expression="#[output application/java --- payload.DateTime as DateTime]" is="#[MunitTools::allOf([&#10;	MunitTools::lessThan(now()), // not in the future&#10;	MunitTools::greaterThan(now() - |PT3S|) // not too old&#10;])]"/>
 		</munit:validation>
