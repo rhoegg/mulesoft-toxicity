@@ -9,7 +9,6 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<azure-cosmos-db-connector-mule-4:key-token-auth-connection baseUri="${db.cosmos.url}" key="${db.cosmos.key}" version="2018-12-31" />
 	</azure-cosmos-db-connector-mule-4:key-token-config>
 	<flow name="saveResultsToCosmos" doc:id="a6b20e2d-faff-47c3-b9cf-a9beadfc8b23" >
-		<set-variable value="#[uuid()]" doc:name="cosmosId" doc:id="80e8a713-5bb7-4e6b-8cfc-2e71aea2b772" variableName="cosmosId"/>
 		<ee:transform doc:name="to Cosmos data model" doc:id="4a738a7d-5e06-4165-b781-d24a77f6a7fb" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0

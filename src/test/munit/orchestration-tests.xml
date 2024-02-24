@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:azure-cosmos-db-connector-mule-4="http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xsi:schemaLocation="
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4 http://www.mulesoft.org/schema/mule/azure-cosmos-db-connector-mule-4/current/mule-azure-cosmos-db-connector-mule-4.xsd">
 	<munit:config name="orchestration-tests.xml" doc:description="This suite is intended to test the dispatch of an API request to all the different AI backends, and the persistence of the results as well as the proper response format. It is not intended to test REST API behaviors such as HTTP headers, status codes, authentication, etc.  Separate suites will be created for each of the AI backends independently."/>
+	<munit:test name="givenAtLeastOneSuccessfulModeration_postCommentsFlow_shouldPersistAllSuccessfulModerations" doc:id="0cef9a84-b6e4-4aea-ab59-448940a291d0" doc:description="This test should make sure that the user input and all moderation results are saved in Cosmos DB for use in fine tuning classification models.">
+		<munit:execution >
+			<ee:transform doc:name="apiRequest" doc:id="0fc1f294-dafe-4676-b205-fd9eb06066f8" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	comment: "test user input"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="postCommentsFlow" doc:id="8aa7cef9-6fb2-4f98-ab87-be8a34b62fdf" name="post:\comments:application\json:pg-rated-api-1-config"/>
+			<munit-tools:sleep time="750" doc:name="750ms" doc:id="2158b9a5-46b6-40c5-9803-d3cab93c4194" />
+			<set-variable value="#[output application/json --- now()]" doc:name="testTimestamp" doc:id="3cc2874d-1bcb-43a2-be38-2cedc1dd2339" variableName="testTimestamp"/>
+			<azure-cosmos-db-connector-mule-4:get-document doc:name="cosmosId" doc:id="b37b635c-fc74-4831-a338-41ea4e77d7a4" config-ref="Azure_Cosmos_Db_Key_Token_Config" dbIdUriParam="mulesoftcommunity" collIdUriParam="moderations" docIdUriParam="#[vars.cosmosId]" xMsDocumentdbPartitionkeyHeader='#[write([vars.cosmosId], "application/json")]'/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="record ID is the generated one" doc:id="af0698a6-d75b-43af-a720-d86744757822" expression="#[payload.id]" is="#[MunitTools::equalTo(vars.cosmosId)]"/>
+			<munit-tools:assert-that doc:name="DateTime is recent" doc:id="4849d2eb-fcd7-4791-b15f-8d628e6df18d" expression="#[output application/java --- payload.DateTime as DateTime]" is="#[MunitTools::allOf([&#10;	MunitTools::lessThan(now()), // not in the future&#10;	MunitTools::greaterThan(now() - |PT3S|) // not too old&#10;])]"/>
+		</munit:validation>
+	</munit:test>
 
 </mule>

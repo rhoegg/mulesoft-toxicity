@@ -120,7 +120,7 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="post:\comments:application\json:pg-rated-api-1-config">
+    <flow name="post:\comments:application\json:pg-rated-api-1-config" doc:id="2752a8bd-05f5-4c2c-bd83-0d9f61577128">
 		<set-variable value="#[payload.comment]" doc:name="comment" doc:id="b91084a6-7100-4800-97a4-ba1cafa12fcc" variableName="comment"/>
 		<scatter-gather doc:name="Scatter-Gather" doc:id="03e3e384-0b2a-4245-84b9-c7c5f00ced37" >
 			<route >
@@ -159,7 +159,8 @@ var awsResult = payload[4].payload
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<async doc:name="Async" doc:id="48c89576-de38-4cdd-9614-f70292cf60ac" >
+		<set-variable value="#[uuid()]" doc:name="cosmosId" doc:id="9be253b9-ecfa-4ede-8b75-28e943e6a9d6" variableName="cosmosId"/>
+		<async doc:name="Async" doc:id="8bfb584c-33bf-4d83-8e42-6a7a5c1a737d" >
 			<flow-ref doc:name="saveResultsToCosmos" doc:id="8a6bdbe0-4f02-4e96-9af1-51301d17a765" name="saveResultsToCosmos" />
 		</async>
     </flow>
