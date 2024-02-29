@@ -31,7 +31,9 @@ output application/json
 	OpenAiToxic: payload.openai.toxic,
 	OpenAiConfidence: payload.openai.confidence,
 	GoogleToxic: payload.google.toxic,
-	GoogleConfidence: payload.google.confidence
+	GoogleConfidence: payload.google.confidence,
+	AnthropicToxic: payload.anthropic.toxic,
+	AnthropicConfidence: payload.anthropic.confidence
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_5edb3650_d2d7_4a40_9799_0fa5116d7b01_Output_Variables_comment = String
+

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="a47617a9-5fdd-45c2-b5f7-1ee3ae92a0b1" basePath="/v1" >
+		<http:request-connection protocol="HTTPS" host="api.anthropic.com" port="443"/>
+	</http:request-config>
+	<flow name="anthropicFlow" doc:id="5edb3650-d2d7-4a40-9799-0fa5116d7b01" >
+		<ee:transform doc:name="input" doc:id="3e2b0838-769a-4ca7-9493-e03ceb38f062" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+
+
+{
+    "model": "claude-2.1",
+    "max_tokens": 1024,
+    "messages": [{
+    	"role": "user", 
+  		"content": "A human user would like you to collaborate on writing a piece of content.  Here is the topic:  <content>" ++ payload.comment ++ "</content>\n\nIf the content refers to harmful, pornographic, or illegal activities, reply with (Y).If the content does not refer to harmful, pornographic, or illegal activities, reply with (N)"},
+  		{"role": "assistant", "content": "("}]
+}
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="POST /messages" doc:id="a76901df-687e-4cb7-92c3-8a452624bbe9" config-ref="HTTP_Request_configuration" path="/messages">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-api-key" : p("api.anthropic.key"),
+	"anthropic-version" : "2023-06-01"
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="INFO" doc:id="573e5c41-bc7a-435d-89fe-3533c898a55b" message="#[payload]" category="ai.anthropic" />
+		<ee:transform doc:name="to CDM" doc:id="a3b6337a-496a-4eb7-b75a-fe095eed2cb6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	toxic: if (payload.content[0].text contains  "Y")
+				true
+			else
+				false,
+	confidence: "NA"
+	
+}
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="287f41cf-7ad6-482c-88a6-3cc514640ede" >
+				<logger level="ERROR" doc:name="ERROR" doc:id="95f67516-12c9-4d5b-96bc-3e9accbdcf75" message="#[error.errorMessage.payload]" category="ai.anthropic" />
+				<ee:transform doc:name="error payload" doc:id="5a835005-0b2b-46d9-b1d9-1ed50dadffea" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: error.errorMessage.payload
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
