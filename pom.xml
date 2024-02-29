@@ -4,7 +4,7 @@
 
 	<groupId>com.mycompany</groupId>
 	<artifactId>toxic-validation</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>mule-application</packaging>
 
 	<name>toxic-validation</name>
@@ -31,7 +31,7 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-					<classifier>mule-application</classifier>
+					<classifier>---- select project type ----</classifier>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -98,8 +98,8 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>2c5ae331-f1ac-47db-9b98-fcc3872caac4</groupId>
-			<artifactId>pg-rated-api-1</artifactId>
+			<groupId>4ae75533-3c17-48fe-a892-26b3ba0ff761</groupId>
+			<artifactId>pg-rated-api</artifactId>
 			<version>1.0.0</version>
 			<classifier>raml</classifier>
 			<type>zip</type>
