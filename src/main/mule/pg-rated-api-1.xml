@@ -139,6 +139,9 @@ output application/json
 			<route >
 				<flow-ref doc:name="AWS Comprehend" doc:id="d1963515-eed6-4a91-8ce8-920bd43aa950" name="awscomprehendFlow"/>
 			</route>
+			<route >
+				<flow-ref doc:name="Anthropic" doc:id="20286109-30dc-4cd9-86e1-d86bb08d7a48" name="anthropicFlow"/>
+			</route>
 		</scatter-gather>
 		<ee:transform doc:name="composite result" doc:id="fe587048-ac4c-407c-a578-0d223c088222" >
 			<ee:message >
@@ -149,6 +152,7 @@ var openaiResult = payload[1].payload
 var googleResult = payload[2].payload
 var cohereResult = payload[3].payload
 var awsResult = payload[4].payload
+var anthropicResult = payload[5].payload
 
 ---
 {
@@ -156,7 +160,8 @@ var awsResult = payload[4].payload
 	openai: openaiResult,
 	(google: googleResult) if (! googleResult.error?),
 	(cohere: cohereResult) if (! cohereResult.error?),
-	(aws: awsResult) if (! awsResult.error?)
+	(aws: awsResult) if (! awsResult.error?),
+	(anthropic: anthropicResult) if (! awsResult.error?)
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
