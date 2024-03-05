@@ -161,7 +161,7 @@ var anthropicResult = payload[5].payload
 	(google: googleResult) if (! googleResult.error?),
 	(cohere: cohereResult) if (! cohereResult.error?),
 	(aws: awsResult) if (! awsResult.error?),
-	(anthropic: anthropicResult) if (! awsResult.error?)
+	(anthropic: anthropicResult) if (! anthropicResult.error?)
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
